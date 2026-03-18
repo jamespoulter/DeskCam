@@ -1,0 +1,29 @@
+name: DeskCam
+options:
+  bundleIdPrefix: com.deskcam
+  deploymentTarget:
+    macOS: "13.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+targets:
+  DeskCam:
+    type: application
+    platform: macOS
+    sources:
+      - path: DeskCam
+        excludes:
+          - "Resources/Info.plist"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.deskcam.app
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_FILE: DeskCam/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: DeskCam/Resources/DeskCam.entitlements
+        SWIFT_VERSION: "5.9"
+        MACOSX_DEPLOYMENT_TARGET: "13.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        COMBINE_HIDPI_IMAGES: YES
