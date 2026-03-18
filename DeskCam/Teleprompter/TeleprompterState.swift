@@ -37,27 +37,29 @@ class TeleprompterState: ObservableObject {
     }
 
     func loadFile() {
-        // Run on a background thread to avoid blocking the menu bar
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let panel = NSOpenPanel()
-            panel.allowedContentTypes = [.plainText]
-            panel.allowsMultipleSelection = false
-            panel.canChooseDirectories = false
-            panel.message = "Select a text file for the teleprompter"
-            panel.treatsFilePackagesAsDirectories = false
+        // Create panel on main thread, then run modal after a short delay
+        // to let the MenuBarExtra popover dismiss
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.plainText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.message = "Select a text file for the teleprompter"
+        panel.treatsFilePackagesAsDirectories = false
+        panel.level = .floating
 
-            DispatchQueue.main.sync {
-                panel.level = .floating
-            }
+        // Close the menu bar popover first
+        if let window = NSApp.keyWindow {
+            window.close()
+        }
 
-            let response = panel.runModal()
-            guard let self, response == .OK, let url = panel.url else { return }
-
-            let content = try? String(contentsOf: url, encoding: .utf8)
-            Task { @MainActor in
-                if let content {
-                    self.text = content
-                    self.resetPosition()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            panel.begin { response in
+                guard let self, response == .OK, let url = panel.url else { return }
+                if let content = try? String(contentsOf: url, encoding: .utf8) {
+                    Task { @MainActor in
+                        self.text = content
+                        self.resetPosition()
+                    }
                 }
             }
         }

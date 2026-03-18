@@ -1,0 +1,408 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		144EF80B594EA532544C972F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F05C3A6394DD8654421F0F49 /* Assets.xcassets */; };
+		15320E8C07CABA09FAEEA7E2 /* FloatingCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563A9502EED5E9347F7BC1F6 /* FloatingCameraView.swift */; };
+		67C5DC4F80FF216A2474E926 /* TeleprompterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F430DCD4D8647ADFCE216D10 /* TeleprompterView.swift */; };
+		76660CB5DFD27064F775F946 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB82AA3E19EA9CAE9499F06E /* CameraManager.swift */; };
+		81192F11567D93460BB86073 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4124CE61FAF52FCDBD704F9D /* MenuBarView.swift */; };
+		824F32C7D2ED1D5A1DB6180F /* FloatingPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 997F5653056D631983F37BBB /* FloatingPanelController.swift */; };
+		8387D47D1631FE125B4BA15A /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEEB03A4871FB9C4071DEDEB /* CameraPreviewView.swift */; };
+		85108EDA16695D0BDE9BA9C3 /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CC0BBBA6E781E5C07351E4 /* LoginItemManager.swift */; };
+		8A783D687948188C5563082C /* TeleprompterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F2AD5D4E191DBD92296728 /* TeleprompterState.swift */; };
+		92059AD2A7C32519A7386F50 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6719EB0A3E0DCE18D149DAE2 /* AppState.swift */; };
+		CC3302D71D10842E66D496AD /* DeskCamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6464F45C7D96DC99200F3EB8 /* DeskCamApp.swift */; };
+		D22B84BB594B34A067D8D02C /* RecordingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4973B13018F487393D5EE9A5 /* RecordingManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4124CE61FAF52FCDBD704F9D /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		4973B13018F487393D5EE9A5 /* RecordingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingManager.swift; sourceTree = "<group>"; };
+		563A9502EED5E9347F7BC1F6 /* FloatingCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingCameraView.swift; sourceTree = "<group>"; };
+		6464F45C7D96DC99200F3EB8 /* DeskCamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskCamApp.swift; sourceTree = "<group>"; };
+		6719EB0A3E0DCE18D149DAE2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		77F3AF8B1377E44AC4EE7084 /* DeskCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeskCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		997F5653056D631983F37BBB /* FloatingPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelController.swift; sourceTree = "<group>"; };
+		B1A05FF979DAC5EAF5EE46ED /* DeskCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DeskCam.entitlements; sourceTree = "<group>"; };
+		DB82AA3E19EA9CAE9499F06E /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		E5CC0BBBA6E781E5C07351E4 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
+		E6F2AD5D4E191DBD92296728 /* TeleprompterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeleprompterState.swift; sourceTree = "<group>"; };
+		F05C3A6394DD8654421F0F49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F430DCD4D8647ADFCE216D10 /* TeleprompterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeleprompterView.swift; sourceTree = "<group>"; };
+		FEEB03A4871FB9C4071DEDEB /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		004611E282FF9B08F334B9A5 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6719EB0A3E0DCE18D149DAE2 /* AppState.swift */,
+				6464F45C7D96DC99200F3EB8 /* DeskCamApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		117EEE013B7ABEBC951FD243 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				4124CE61FAF52FCDBD704F9D /* MenuBarView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		12BB0085A956DA7392774906 = {
+			isa = PBXGroup;
+			children = (
+				3430695E141712D38D7144E9 /* DeskCam */,
+				6B30552FD98D1FE5D0C22C41 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3430695E141712D38D7144E9 /* DeskCam */ = {
+			isa = PBXGroup;
+			children = (
+				004611E282FF9B08F334B9A5 /* App */,
+				5FAB9A6D8694F6F344422F4A /* Camera */,
+				117EEE013B7ABEBC951FD243 /* MenuBar */,
+				D7C8A76DD796307B0F32AEEF /* Resources */,
+				746F6CC104EB8301AFB7F937 /* Startup */,
+				64794C9FCA08F496430C9FB7 /* Teleprompter */,
+				CBE5E0418B50B3D33496052D /* Windows */,
+			);
+			path = DeskCam;
+			sourceTree = "<group>";
+		};
+		5FAB9A6D8694F6F344422F4A /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				DB82AA3E19EA9CAE9499F06E /* CameraManager.swift */,
+				FEEB03A4871FB9C4071DEDEB /* CameraPreviewView.swift */,
+				4973B13018F487393D5EE9A5 /* RecordingManager.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		64794C9FCA08F496430C9FB7 /* Teleprompter */ = {
+			isa = PBXGroup;
+			children = (
+				E6F2AD5D4E191DBD92296728 /* TeleprompterState.swift */,
+				F430DCD4D8647ADFCE216D10 /* TeleprompterView.swift */,
+			);
+			path = Teleprompter;
+			sourceTree = "<group>";
+		};
+		6B30552FD98D1FE5D0C22C41 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				77F3AF8B1377E44AC4EE7084 /* DeskCam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		746F6CC104EB8301AFB7F937 /* Startup */ = {
+			isa = PBXGroup;
+			children = (
+				E5CC0BBBA6E781E5C07351E4 /* LoginItemManager.swift */,
+			);
+			path = Startup;
+			sourceTree = "<group>";
+		};
+		CBE5E0418B50B3D33496052D /* Windows */ = {
+			isa = PBXGroup;
+			children = (
+				563A9502EED5E9347F7BC1F6 /* FloatingCameraView.swift */,
+				997F5653056D631983F37BBB /* FloatingPanelController.swift */,
+			);
+			path = Windows;
+			sourceTree = "<group>";
+		};
+		D7C8A76DD796307B0F32AEEF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F05C3A6394DD8654421F0F49 /* Assets.xcassets */,
+				B1A05FF979DAC5EAF5EE46ED /* DeskCam.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E27BA25F1A5430B7504F890F /* DeskCam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B3BFA57CD1AC3C7C63FA8EE5 /* Build configuration list for PBXNativeTarget "DeskCam" */;
+			buildPhases = (
+				6D3AA79139C90E2D71C9EA0B /* Sources */,
+				EBC6F56234E9B247AF847125 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DeskCam;
+			packageProductDependencies = (
+			);
+			productName = DeskCam;
+			productReference = 77F3AF8B1377E44AC4EE7084 /* DeskCam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		420896CD8827D5C5D3216B8E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					E27BA25F1A5430B7504F890F = {
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 322E69EF1E85BDB93360AE8A /* Build configuration list for PBXProject "DeskCam" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 12BB0085A956DA7392774906;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6B30552FD98D1FE5D0C22C41 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E27BA25F1A5430B7504F890F /* DeskCam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EBC6F56234E9B247AF847125 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				144EF80B594EA532544C972F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6D3AA79139C90E2D71C9EA0B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				92059AD2A7C32519A7386F50 /* AppState.swift in Sources */,
+				76660CB5DFD27064F775F946 /* CameraManager.swift in Sources */,
+				8387D47D1631FE125B4BA15A /* CameraPreviewView.swift in Sources */,
+				CC3302D71D10842E66D496AD /* DeskCamApp.swift in Sources */,
+				15320E8C07CABA09FAEEA7E2 /* FloatingCameraView.swift in Sources */,
+				824F32C7D2ED1D5A1DB6180F /* FloatingPanelController.swift in Sources */,
+				85108EDA16695D0BDE9BA9C3 /* LoginItemManager.swift in Sources */,
+				81192F11567D93460BB86073 /* MenuBarView.swift in Sources */,
+				D22B84BB594B34A067D8D02C /* RecordingManager.swift in Sources */,
+				8A783D687948188C5563082C /* TeleprompterState.swift in Sources */,
+				67C5DC4F80FF216A2474E926 /* TeleprompterView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		37D29F0DE65A75A20FB58842 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		869752C61D8F44E09EFC2FA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = DeskCam/Resources/DeskCam.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = DeskCam/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deskcam.app;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		966617D408B8A2D8B583F6BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = DeskCam/Resources/DeskCam.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = DeskCam/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deskcam.app;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		9A0B10C2FC143A37795A8472 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		322E69EF1E85BDB93360AE8A /* Build configuration list for PBXProject "DeskCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37D29F0DE65A75A20FB58842 /* Debug */,
+				9A0B10C2FC143A37795A8472 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B3BFA57CD1AC3C7C63FA8EE5 /* Build configuration list for PBXNativeTarget "DeskCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				869752C61D8F44E09EFC2FA2 /* Debug */,
+				966617D408B8A2D8B583F6BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 420896CD8827D5C5D3216B8E /* Project object */;
+}

@@ -105,23 +105,25 @@ class RecordingManager: NSObject, ObservableObject {
     }
 
     func chooseOutputFolder() {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let panel = NSOpenPanel()
-            panel.canChooseFiles = false
-            panel.canChooseDirectories = true
-            panel.canCreateDirectories = true
-            panel.allowsMultipleSelection = false
-            panel.message = "Choose where to save recordings"
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.canCreateDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.message = "Choose where to save recordings"
+        panel.level = .floating
 
-            DispatchQueue.main.sync {
-                panel.level = .floating
-            }
+        if let window = NSApp.keyWindow {
+            window.close()
+        }
 
-            let response = panel.runModal()
-            guard let self, response == .OK, let url = panel.url else { return }
-            Task { @MainActor in
-                self.outputFolderURL = url
-                UserDefaults.standard.set(url.path, forKey: "outputFolder")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            panel.begin { response in
+                guard let self, response == .OK, let url = panel.url else { return }
+                Task { @MainActor in
+                    self.outputFolderURL = url
+                    UserDefaults.standard.set(url.path, forKey: "outputFolder")
+                }
             }
         }
     }
