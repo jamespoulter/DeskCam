@@ -13,12 +13,13 @@ struct TeleprompterView: View {
                     .font(.system(size: state.fontSize, weight: .medium, design: .rounded))
                     .foregroundColor(.white.opacity(state.textOpacity))
                     .shadow(color: .black.opacity(0.9), radius: 3, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.6), radius: 6, x: 0, y: 3)
+                    .shadow(color: .black.opacity(0.5), radius: 6, x: 0, y: 3)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(8)
+                    .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)
-                    .frame(width: geometry.size.width - 48, alignment: .center)
-                    .padding(.horizontal, 24)
+                    // Narrower text column for the wider window
+                    .frame(width: min(geometry.size.width - 120, 380), alignment: .center)
+                    .frame(maxWidth: .infinity)
 
                 Spacer()
                     .frame(height: geometry.size.height)
