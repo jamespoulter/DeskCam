@@ -14,7 +14,7 @@ struct CameraPreviewView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: CameraPreviewNSView, context: Context) {
-        nsView.previewLayer.session = session
+        // Only update mirror transform — don't reassign session
         updateMirror(nsView)
     }
 

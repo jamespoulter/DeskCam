@@ -21,16 +21,13 @@ class RecordingManager: NSObject, ObservableObject {
     @Published var videoFormat: VideoFormat = .mp4
     @Published var outputFolderURL: URL
 
-    private var movieOutput: AVCaptureMovieFileOutput?
     private var durationTimer: Timer?
     private var recordingStartTime: Date?
 
     override init() {
-        // Default output folder: ~/Movies/DeskCam/
         let moviesDir = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask).first!
         let defaultFolder = moviesDir.appendingPathComponent("DeskCam")
 
-        // Restore saved folder or use default
         if let savedPath = UserDefaults.standard.string(forKey: "outputFolder"),
            FileManager.default.fileExists(atPath: savedPath) {
             self.outputFolderURL = URL(fileURLWithPath: savedPath)
@@ -38,7 +35,6 @@ class RecordingManager: NSObject, ObservableObject {
             self.outputFolderURL = defaultFolder
         }
 
-        // Restore saved format
         if let savedFormat = UserDefaults.standard.string(forKey: "videoFormat"),
            let format = VideoFormat(rawValue: savedFormat) {
             self.videoFormat = format
@@ -46,19 +42,10 @@ class RecordingManager: NSObject, ObservableObject {
 
         super.init()
 
-        // Ensure output folder exists
         try? FileManager.default.createDirectory(at: outputFolderURL, withIntermediateDirectories: true)
     }
 
-    func configureOutput(for session: AVCaptureSession) {
-        let output = AVCaptureMovieFileOutput()
-        if session.canAddOutput(output) {
-            session.addOutput(output)
-            self.movieOutput = output
-        }
-    }
-
-    func startRecording() {
+    func startRecording(movieOutput: AVCaptureMovieFileOutput?) {
         guard let movieOutput, !isRecording else { return }
 
         // Ensure folder exists
@@ -67,20 +54,11 @@ class RecordingManager: NSObject, ObservableObject {
         let filename = generateFilename()
         let fileURL = outputFolderURL.appendingPathComponent(filename)
 
-        // Configure H.265 (HEVC) encoding
-        if let connection = movieOutput.connection(with: .video) {
-            movieOutput.setOutputSettings(
-                [AVVideoCodecKey: AVVideoCodecType.hevc],
-                for: connection
-            )
-        }
-
         movieOutput.startRecording(to: fileURL, recordingDelegate: self)
         isRecording = true
         recordingStartTime = Date()
         recordingDuration = 0
 
-        // Start duration timer
         durationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self, let start = self.recordingStartTime else { return }
@@ -89,18 +67,18 @@ class RecordingManager: NSObject, ObservableObject {
         }
     }
 
-    func stopRecording() {
+    func stopRecording(movieOutput: AVCaptureMovieFileOutput?) {
         guard isRecording else { return }
         movieOutput?.stopRecording()
         durationTimer?.invalidate()
         durationTimer = nil
     }
 
-    func toggleRecording() {
+    func toggleRecording(movieOutput: AVCaptureMovieFileOutput?) {
         if isRecording {
-            stopRecording()
+            stopRecording(movieOutput: movieOutput)
         } else {
-            startRecording()
+            startRecording(movieOutput: movieOutput)
         }
     }
 
@@ -155,8 +133,6 @@ class RecordingManager: NSObject, ObservableObject {
         return "DeskCam-\(timestamp).\(videoFormat.rawValue)"
     }
 }
-
-// MARK: - AVCaptureFileOutputRecordingDelegate
 
 extension RecordingManager: AVCaptureFileOutputRecordingDelegate {
     nonisolated func fileOutput(

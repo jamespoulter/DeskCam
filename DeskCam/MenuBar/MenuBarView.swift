@@ -27,7 +27,7 @@ struct MenuBarView: View {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    RecordingSection(recording: appState.recordingManager)
+                    RecordingSection(recording: appState.recordingManager, appState: appState)
                     Divider()
                     TeleprompterSection(state: appState.teleprompterState)
                     Divider()
@@ -185,6 +185,7 @@ struct SettingsSection: View {
 
 struct RecordingSection: View {
     @ObservedObject var recording: RecordingManager
+    let appState: AppState
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -205,7 +206,7 @@ struct RecordingSection: View {
             }
 
             // Record button
-            Button(action: { recording.toggleRecording() }) {
+            Button(action: { appState.toggleRecording() }) {
                 Label(
                     recording.isRecording ? "Stop Recording" : "Start Recording",
                     systemImage: recording.isRecording ? "stop.fill" : "record.circle"

@@ -9,24 +9,24 @@ class CameraManager: ObservableObject {
 
     let captureSession = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "com.deskcam.session")
-    private var isConfigured = false
+    private(set) var isConfigured = false
+    private(set) var movieOutput: AVCaptureMovieFileOutput?
 
     func requestPermission() async {
         let granted = await AVCaptureDevice.requestAccess(for: .video)
         permissionStatus = granted ? .authorized : .denied
-        if granted && !isConfigured {
-            configureSession(recordingManager: nil)
-        }
     }
 
-    func configureSession(recordingManager: RecordingManager?) {
+    func configureSession() {
+        guard !isConfigured else { return }
+
         sessionQueue.async { [weak self] in
             guard let self else { return }
 
             self.captureSession.beginConfiguration()
             self.captureSession.sessionPreset = .high
 
-            // Find camera
+            // 1. Add video input
             guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
                     ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified)
                     ?? AVCaptureDevice.default(for: .video) else {
@@ -37,7 +37,6 @@ class CameraManager: ObservableObject {
                 return
             }
 
-            // Add video input
             do {
                 let videoInput = try AVCaptureDeviceInput(device: camera)
                 if self.captureSession.canAddInput(videoInput) {
@@ -49,7 +48,7 @@ class CameraManager: ObservableObject {
                 }
             }
 
-            // Add audio input (for recording)
+            // 2. Add audio input
             if let microphone = AVCaptureDevice.default(for: .audio) {
                 do {
                     let audioInput = try AVCaptureDeviceInput(device: microphone)
@@ -61,16 +60,24 @@ class CameraManager: ObservableObject {
                 }
             }
 
-            // Add movie file output for recording
-            if let recordingManager {
-                Task { @MainActor in
-                    recordingManager.configureOutput(for: self.captureSession)
+            // 3. Add movie file output (synchronously, within begin/commit)
+            let output = AVCaptureMovieFileOutput()
+            if self.captureSession.canAddOutput(output) {
+                self.captureSession.addOutput(output)
+
+                // Configure HEVC encoding
+                if let connection = output.connection(with: .video) {
+                    output.setOutputSettings(
+                        [AVVideoCodecKey: AVVideoCodecType.hevc],
+                        for: connection
+                    )
                 }
             }
 
             self.captureSession.commitConfiguration()
 
             Task { @MainActor in
+                self.movieOutput = output
                 self.isConfigured = true
             }
         }
@@ -80,6 +87,10 @@ class CameraManager: ObservableObject {
         guard permissionStatus == .authorized else {
             Task { await requestPermission() }
             return
+        }
+
+        if !isConfigured {
+            configureSession()
         }
 
         sessionQueue.async { [weak self] in

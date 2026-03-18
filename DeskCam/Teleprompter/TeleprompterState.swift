@@ -5,22 +5,30 @@ import UniformTypeIdentifiers
 @MainActor
 class TeleprompterState: ObservableObject {
     @Published var text: String = ""
-    @Published var scrollSpeed: Double = 30.0 // points per second
+    @Published var scrollSpeed: Double = 30.0
     @Published var isScrolling: Bool = false
     @Published var scrollOffset: CGFloat = 0.0
     @Published var fontSize: CGFloat = 18.0
     @Published var textOpacity: Double = 0.9
 
-    // 60fps timer that drives the scroll
-    let scrollTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
+    // Timer only runs when scrolling — not a global autoconnect
+    private var scrollTimer: Timer?
 
     func startScrolling() {
         guard !text.isEmpty else { return }
         isScrolling = true
+        scrollTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.isScrolling else { return }
+                self.scrollOffset += self.scrollSpeed / 60.0
+            }
+        }
     }
 
     func stopScrolling() {
         isScrolling = false
+        scrollTimer?.invalidate()
+        scrollTimer = nil
     }
 
     func toggleScrolling() {
@@ -32,13 +40,11 @@ class TeleprompterState: ObservableObject {
     }
 
     func resetPosition() {
+        stopScrolling()
         scrollOffset = 0
-        isScrolling = false
     }
 
     func loadFile() {
-        // Create panel on main thread, then run modal after a short delay
-        // to let the MenuBarExtra popover dismiss
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.plainText]
         panel.allowsMultipleSelection = false
@@ -47,7 +53,6 @@ class TeleprompterState: ObservableObject {
         panel.treatsFilePackagesAsDirectories = false
         panel.level = .floating
 
-        // Close the menu bar popover first
         if let window = NSApp.keyWindow {
             window.close()
         }
