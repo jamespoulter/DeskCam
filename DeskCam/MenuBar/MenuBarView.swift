@@ -139,11 +139,13 @@ struct ControlsSection: View {
 
 struct SettingsSection: View {
     @ObservedObject var appState: AppState
+    @ObservedObject var cameraManager: CameraManager
     @ObservedObject var teleprompterState: TeleprompterState
     @ObservedObject var loginItemManager: LoginItemManager
 
     init(appState: AppState) {
         self.appState = appState
+        self.cameraManager = appState.cameraManager
         self.teleprompterState = appState.teleprompterState
         self.loginItemManager = appState.loginItemManager
     }
@@ -152,6 +154,25 @@ struct SettingsSection: View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Settings", systemImage: "gear")
                 .font(.subheadline.bold())
+
+            // Camera picker
+            if cameraManager.availableCameras.count > 1 {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Camera")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Picker("", selection: Binding(
+                        get: { cameraManager.selectedCameraID },
+                        set: { cameraManager.switchCamera(to: $0) }
+                    )) {
+                        ForEach(cameraManager.availableCameras, id: \.uniqueID) { device in
+                            Text(device.localizedName).tag(device.uniqueID)
+                        }
+                    }
+                    .labelsHidden()
+                    .controlSize(.small)
+                }
+            }
 
             Toggle("Mirror Camera", isOn: $appState.isMirrored)
                 .controlSize(.small)

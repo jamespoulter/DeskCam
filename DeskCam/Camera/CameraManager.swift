@@ -6,19 +6,84 @@ class CameraManager: ObservableObject {
     @Published var permissionStatus: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
     @Published var isRunning: Bool = false
     @Published var errorMessage: String?
+    @Published var availableCameras: [AVCaptureDevice] = []
+    @Published var selectedCameraID: String = ""
 
     let captureSession = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "com.deskcam.session")
     private(set) var isConfigured = false
     private(set) var movieOutput: AVCaptureMovieFileOutput?
+    private var currentVideoInput: AVCaptureDeviceInput?
+    private var currentAudioInput: AVCaptureDeviceInput?
 
     func requestPermission() async {
         let granted = await AVCaptureDevice.requestAccess(for: .video)
         permissionStatus = granted ? .authorized : .denied
+        if granted {
+            refreshCameraList()
+        }
+    }
+
+    func refreshCameraList() {
+        var deviceTypes: [AVCaptureDevice.DeviceType] = [.builtInWideAngleCamera]
+        if #available(macOS 14.0, *) {
+            deviceTypes.append(.external)
+        }
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: deviceTypes,
+            mediaType: .video,
+            position: .unspecified
+        )
+        availableCameras = discoverySession.devices
+        if selectedCameraID.isEmpty, let first = availableCameras.first {
+            selectedCameraID = first.uniqueID
+        }
+    }
+
+    func switchCamera(to deviceID: String) {
+        guard deviceID != selectedCameraID || !isConfigured else { return }
+        guard let device = availableCameras.first(where: { $0.uniqueID == deviceID }) else { return }
+
+        selectedCameraID = deviceID
+
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
+
+            self.captureSession.beginConfiguration()
+
+            // Remove current video input
+            if let current = self.currentVideoInput {
+                self.captureSession.removeInput(current)
+            }
+
+            // Add new video input
+            do {
+                let newInput = try AVCaptureDeviceInput(device: device)
+                if self.captureSession.canAddInput(newInput) {
+                    self.captureSession.addInput(newInput)
+                    Task { @MainActor in
+                        self.currentVideoInput = newInput
+                        self.errorMessage = nil
+                    }
+                }
+            } catch {
+                Task { @MainActor in
+                    self.errorMessage = "Failed to switch camera: \(error.localizedDescription)"
+                }
+            }
+
+            self.captureSession.commitConfiguration()
+        }
     }
 
     func configureSession() {
         guard !isConfigured else { return }
+        refreshCameraList()
+
+        let targetDevice = availableCameras.first(where: { $0.uniqueID == selectedCameraID })
+            ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
+            ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified)
+            ?? AVCaptureDevice.default(for: .video)
 
         sessionQueue.async { [weak self] in
             guard let self else { return }
@@ -27,9 +92,7 @@ class CameraManager: ObservableObject {
             self.captureSession.sessionPreset = .high
 
             // 1. Add video input
-            guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
-                    ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified)
-                    ?? AVCaptureDevice.default(for: .video) else {
+            guard let camera = targetDevice else {
                 Task { @MainActor in
                     self.errorMessage = "No camera found"
                 }
@@ -41,6 +104,10 @@ class CameraManager: ObservableObject {
                 let videoInput = try AVCaptureDeviceInput(device: camera)
                 if self.captureSession.canAddInput(videoInput) {
                     self.captureSession.addInput(videoInput)
+                    Task { @MainActor in
+                        self.currentVideoInput = videoInput
+                        self.selectedCameraID = camera.uniqueID
+                    }
                 }
             } catch {
                 Task { @MainActor in
@@ -54,18 +121,20 @@ class CameraManager: ObservableObject {
                     let audioInput = try AVCaptureDeviceInput(device: microphone)
                     if self.captureSession.canAddInput(audioInput) {
                         self.captureSession.addInput(audioInput)
+                        Task { @MainActor in
+                            self.currentAudioInput = audioInput
+                        }
                     }
                 } catch {
                     print("Could not add audio input: \(error.localizedDescription)")
                 }
             }
 
-            // 3. Add movie file output (synchronously, within begin/commit)
+            // 3. Add movie file output
             let output = AVCaptureMovieFileOutput()
             if self.captureSession.canAddOutput(output) {
                 self.captureSession.addOutput(output)
 
-                // Configure HEVC encoding
                 if let connection = output.connection(with: .video) {
                     output.setOutputSettings(
                         [AVVideoCodecKey: AVVideoCodecType.hevc],
