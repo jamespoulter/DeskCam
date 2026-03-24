@@ -35,6 +35,10 @@ class CameraManager: ObservableObject {
             position: .unspecified
         )
         availableCameras = discoverySession.devices
+        print("[CameraManager] Found \(availableCameras.count) cameras:")
+        for cam in availableCameras {
+            print("  - \(cam.localizedName) [\(cam.uniqueID)] suspended=\(cam.isSuspended)")
+        }
         if selectedCameraID.isEmpty, let first = availableCameras.first {
             selectedCameraID = first.uniqueID
         }
@@ -42,9 +46,13 @@ class CameraManager: ObservableObject {
 
     func switchCamera(to deviceID: String) {
         guard deviceID != selectedCameraID || !isConfigured else { return }
-        guard let device = availableCameras.first(where: { $0.uniqueID == deviceID }) else { return }
+        guard let device = availableCameras.first(where: { $0.uniqueID == deviceID }) else {
+            print("[CameraManager] Device not found: \(deviceID)")
+            return
+        }
 
         selectedCameraID = deviceID
+        print("[CameraManager] Switching to: \(device.localizedName) (suspended=\(device.isSuspended))")
 
         sessionQueue.async { [weak self] in
             guard let self else { return }
@@ -65,14 +73,29 @@ class CameraManager: ObservableObject {
                         self.currentVideoInput = newInput
                         self.errorMessage = nil
                     }
+                    print("[CameraManager] Successfully added input for \(device.localizedName)")
+                } else {
+                    print("[CameraManager] canAddInput returned false for \(device.localizedName)")
+                    Task { @MainActor in
+                        self.errorMessage = "Cannot use \(device.localizedName)"
+                    }
                 }
             } catch {
+                print("[CameraManager] Error switching camera: \(error)")
                 Task { @MainActor in
                     self.errorMessage = "Failed to switch camera: \(error.localizedDescription)"
                 }
             }
 
             self.captureSession.commitConfiguration()
+
+            // Restart session if it was running
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+                Task { @MainActor in
+                    self.isRunning = true
+                }
+            }
         }
     }
 
