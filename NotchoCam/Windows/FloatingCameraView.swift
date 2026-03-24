@@ -6,9 +6,9 @@ struct FloatingCameraView: View {
     @State private var hideControlsTask: Task<Void, Never>?
     @State private var appeared = false
 
-    // Wide notch-inspired dimensions
-    private let viewWidth: CGFloat = 550
-    private let viewHeight: CGFloat = 340
+    // Wide shallow notch dimensions — wider and shallower for true notch feel
+    private let viewWidth: CGFloat = 620
+    private let viewHeight: CGFloat = 300
 
     var body: some View {
         ZStack {
@@ -98,22 +98,10 @@ struct FloatingCameraView: View {
             }
         }
         .frame(width: viewWidth, height: viewHeight)
-        // Wide horizontal elliptical fade — emulates the notch silhouette
+        // Notch mask: flat top + wide shallow semicircle + infinity fade
         .mask(
-            EllipticalGradient(
-                stops: [
-                    .init(color: .white, location: 0.0),
-                    .init(color: .white, location: 0.25),
-                    .init(color: .white.opacity(0.9), location: 0.35),
-                    .init(color: .white.opacity(0.6), location: 0.48),
-                    .init(color: .white.opacity(0.2), location: 0.62),
-                    .init(color: .white.opacity(0.05), location: 0.75),
-                    .init(color: .clear, location: 0.85)
-                ],
-                center: .init(x: 0.5, y: 0.35)
-            )
-            // Stretch wider to match the notch's horizontal aspect
-            .scaleEffect(x: 1.3, y: 1.0)
+            NotchFadeMask()
+                .frame(width: viewWidth, height: viewHeight)
         )
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.25)) {
@@ -124,7 +112,11 @@ struct FloatingCameraView: View {
         .scaleEffect(appeared ? 1.0 : 0.95)
         .opacity(appeared ? 1.0 : 0.0)
         .onAppear {
-            Task { await appState.cameraManager.requestPermission() }
+            // Only auto-request permission if onboarding is complete
+            // (onboarding handles the permission flow itself)
+            if appState.hasCompletedOnboarding {
+                Task { await appState.cameraManager.requestPermission() }
+            }
             withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) { appeared = true }
         }
     }
@@ -209,7 +201,7 @@ struct CameraStatusOverlay: View {
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(.white.opacity(0.7))
                 Button("Open Settings") { cameraManager.openSystemSettings() }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.brand)
                     .controlSize(.small)
             }
         } else if let error = cameraManager.errorMessage {
@@ -251,20 +243,20 @@ struct ControlOverlay: View {
                 )
                 glassButton(
                     icon: teleprompterState.isScrolling ? "pause.fill" : "play.fill",
+                    tint: Color.brand,
                     action: { teleprompterState.toggleScrolling() }
                 )
                 glassButton(
                     icon: "arrow.counterclockwise",
+                    tint: Color.brand,
                     action: { teleprompterState.resetPosition() },
                     size: 11
                 )
                 Spacer()
                 glassButton(
                     icon: "xmark",
-                    action: {
-                        appState.isWindowVisible = false
-                        appState.cameraManager.stopSession()
-                    },
+                    tint: Color.brand,
+                    action: { appState.toggleWindow() },
                     size: 11
                 )
             }
@@ -290,5 +282,64 @@ struct ControlOverlay: View {
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Notch Fade Mask
+
+/// A mask that creates a flat-top wide semicircle with a silky smooth gaussian fade.
+/// Flat top hugs the menu bar, wide shallow arc curves down, edges dissolve smoothly.
+/// Uses 40 concentric layers with an easeOut opacity curve for buttery gradation.
+private struct NotchFadeMask: View {
+    var body: some View {
+        Canvas { context, size in
+            let w = size.width
+            let h = size.height
+
+            let archDepth = h * 0.6
+            let sideInset = w * 0.03
+
+            // Core arch path — flat top, wide shallow semicircle bottom
+            var archPath = Path()
+            archPath.move(to: CGPoint(x: sideInset, y: 0))
+            archPath.addLine(to: CGPoint(x: w - sideInset, y: 0))
+            // Smooth cubic curves for a more natural arc
+            archPath.addCurve(
+                to: CGPoint(x: w * 0.5, y: archDepth),
+                control1: CGPoint(x: w - sideInset, y: archDepth * 0.55),
+                control2: CGPoint(x: w * 0.72, y: archDepth)
+            )
+            archPath.addCurve(
+                to: CGPoint(x: sideInset, y: 0),
+                control1: CGPoint(x: w * 0.28, y: archDepth),
+                control2: CGPoint(x: sideInset, y: archDepth * 0.55)
+            )
+            archPath.closeSubpath()
+
+            // 40 layers from outermost (faintest) to innermost (solid)
+            // Gaussian-like falloff: opacity = e^(-3 * t^2)
+            let layerCount = 40
+            let maxExpand: CGFloat = 0.5 // how far the fade extends beyond the core
+
+            for i in (0..<layerCount).reversed() {
+                let t = CGFloat(i) / CGFloat(layerCount - 1) // 0 = core, 1 = outermost
+                let expand = t * maxExpand
+
+                // Gaussian curve for opacity
+                let gaussian = exp(-3.0 * Double(t * t))
+                let opacity = max(0.0, gaussian)
+
+                let scaleX = 1.0 + expand * 0.6
+                let scaleY = 1.0 + expand * 1.4 // fade more aggressively downward
+
+                var transform = CGAffineTransform.identity
+                    .translatedBy(x: w * 0.5, y: 0)
+                    .scaledBy(x: scaleX, y: scaleY)
+                    .translatedBy(x: -w * 0.5, y: 0)
+
+                let scaledPath = archPath.applying(transform)
+                context.fill(scaledPath, with: .color(.white.opacity(opacity)))
+            }
+        }
     }
 }

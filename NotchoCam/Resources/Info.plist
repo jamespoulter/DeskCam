@@ -15,8 +15,8 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>DeskCam needs camera access to show your camera preview.</string>
+	<string>NotchoCam needs camera access to show your camera preview.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>DeskCam needs microphone access to record audio with your video.</string>
+	<string>NotchoCam needs microphone access to record audio with your video.</string>
 </dict>
 </plist>

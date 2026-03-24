@@ -26,7 +26,7 @@ class RecordingManager: NSObject, ObservableObject {
 
     override init() {
         let moviesDir = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask).first!
-        let defaultFolder = moviesDir.appendingPathComponent("DeskCam")
+        let defaultFolder = moviesDir.appendingPathComponent("NotchoCam")
 
         if let savedPath = UserDefaults.standard.string(forKey: "outputFolder"),
            FileManager.default.fileExists(atPath: savedPath) {
@@ -130,7 +130,7 @@ class RecordingManager: NSObject, ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd-HHmmss"
         let timestamp = formatter.string(from: Date())
-        return "DeskCam-\(timestamp).\(videoFormat.rawValue)"
+        return "NotchoCam-\(timestamp).\(videoFormat.rawValue)"
     }
 }
 

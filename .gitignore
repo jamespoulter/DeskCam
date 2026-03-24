@@ -12,7 +12,7 @@ xcuserdata/
 *.dSYM
 
 # Build products
-DeskCam.app/
+NotchoCam.app/
 *.app
 
 # macOS

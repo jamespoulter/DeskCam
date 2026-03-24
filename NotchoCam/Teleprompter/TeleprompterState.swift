@@ -5,14 +5,27 @@ import UniformTypeIdentifiers
 @MainActor
 class TeleprompterState: ObservableObject {
     @Published var text: String = ""
-    @Published var scrollSpeed: Double = 30.0
     @Published var isScrolling: Bool = false
     @Published var scrollOffset: CGFloat = 0.0
-    @Published var fontSize: CGFloat = 18.0
-    @Published var textOpacity: Double = 0.9
 
-    // Timer only runs when scrolling — not a global autoconnect
+    @Published var scrollSpeed: Double {
+        didSet { UserDefaults.standard.set(scrollSpeed, forKey: "scrollSpeed") }
+    }
+    @Published var fontSize: CGFloat {
+        didSet { UserDefaults.standard.set(Double(fontSize), forKey: "fontSize") }
+    }
+    @Published var textOpacity: Double {
+        didSet { UserDefaults.standard.set(textOpacity, forKey: "textOpacity") }
+    }
+
     private var scrollTimer: Timer?
+
+    init() {
+        self.scrollSpeed = UserDefaults.standard.object(forKey: "scrollSpeed") as? Double ?? 30.0
+        let storedFontSize = UserDefaults.standard.object(forKey: "fontSize") as? Double
+        self.fontSize = storedFontSize.map { CGFloat($0) } ?? 18.0
+        self.textOpacity = UserDefaults.standard.object(forKey: "textOpacity") as? Double ?? 0.9
+    }
 
     func startScrolling() {
         guard !text.isEmpty else { return }

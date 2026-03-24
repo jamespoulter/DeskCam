@@ -4,13 +4,14 @@ import SwiftUI
 @MainActor
 class CameraManager: ObservableObject {
     @Published var permissionStatus: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
+    @Published var micPermissionStatus: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .audio)
     @Published var isRunning: Bool = false
     @Published var errorMessage: String?
     @Published var availableCameras: [AVCaptureDevice] = []
     @Published var selectedCameraID: String = ""
 
     let captureSession = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "com.deskcam.session")
+    private let sessionQueue = DispatchQueue(label: "com.notchocam.session")
     private(set) var isConfigured = false
     private(set) var movieOutput: AVCaptureMovieFileOutput?
     private var currentVideoInput: AVCaptureDeviceInput?
@@ -22,6 +23,11 @@ class CameraManager: ObservableObject {
         if granted {
             refreshCameraList()
         }
+    }
+
+    func requestMicPermission() async {
+        let granted = await AVCaptureDevice.requestAccess(for: .audio)
+        micPermissionStatus = granted ? .authorized : .denied
     }
 
     func refreshCameraList() {
