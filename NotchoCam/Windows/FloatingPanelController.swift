@@ -14,9 +14,9 @@ class FloatingPanelController: NSObject, ObservableObject {
                 .environmentObject(appState)
         )
 
-        // Wide shallow notch dimensions
-        let panelWidth: CGFloat = 620
-        let panelHeight: CGFloat = 300
+        // Notch dimensions + space for pop-out controls below
+        let panelWidth: CGFloat = 480
+        let panelHeight: CGFloat = 260
 
         let panel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: panelWidth, height: panelHeight),

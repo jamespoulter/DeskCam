@@ -6,103 +6,83 @@ struct FloatingCameraView: View {
     @State private var hideControlsTask: Task<Void, Never>?
     @State private var appeared = false
 
-    // Wide shallow notch dimensions — wider and shallower for true notch feel
-    private let viewWidth: CGFloat = 620
-    private let viewHeight: CGFloat = 300
+    private let viewWidth: CGFloat = 480
+    private let cameraHeight: CGFloat = 200
+    private let controlsHeight: CGFloat = 60
+    private let totalHeight: CGFloat = 260
 
     var body: some View {
-        ZStack {
-            // Camera feed
-            CameraPreviewView(
-                session: appState.cameraManager.captureSession,
-                isMirrored: appState.isMirrored
-            )
+        VStack(spacing: 0) {
+            // Camera region — masked by NotchFadeMask
+            ZStack {
+                CameraPreviewView(
+                    session: appState.cameraManager.captureSession,
+                    isMirrored: appState.isMirrored
+                )
 
-            // Liquid glass tint — subtle frosted overlay
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .opacity(0.15)
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.15)
 
-            // Dark vignette — elliptical, wider than tall
-            EllipticalGradient(
-                colors: [
-                    .clear,
-                    .clear,
-                    .black.opacity(0.15),
-                    .black.opacity(0.5),
-                    .black.opacity(0.8)
-                ],
-                center: .init(x: 0.5, y: 0.4),
-                startRadiusFraction: 0.15,
-                endRadiusFraction: 0.55
-            )
+                LinearGradient(
+                    stops: [
+                        .init(color: .black.opacity(0.9), location: 0.0),
+                        .init(color: .black.opacity(0.5), location: 0.06),
+                        .init(color: .black.opacity(0.15), location: 0.15),
+                        .init(color: .clear, location: 0.25)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
 
-            // Strong top fade — merges with notch/menu bar
-            LinearGradient(
-                stops: [
-                    .init(color: .black.opacity(0.9), location: 0.0),
-                    .init(color: .black.opacity(0.5), location: 0.06),
-                    .init(color: .black.opacity(0.15), location: 0.15),
-                    .init(color: .clear, location: 0.25)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+                EllipticalGradient(
+                    stops: [
+                        .init(color: .clear, location: 0.35),
+                        .init(color: .white.opacity(0.04), location: 0.45),
+                        .init(color: .white.opacity(0.08), location: 0.5),
+                        .init(color: .white.opacity(0.03), location: 0.55),
+                        .init(color: .clear, location: 0.6)
+                    ],
+                    center: .init(x: 0.5, y: 0.35)
+                )
 
-            // Subtle inner glow — light refraction at edges
-            EllipticalGradient(
-                stops: [
-                    .init(color: .clear, location: 0.35),
-                    .init(color: .white.opacity(0.04), location: 0.45),
-                    .init(color: .white.opacity(0.08), location: 0.5),
-                    .init(color: .white.opacity(0.03), location: 0.55),
-                    .init(color: .clear, location: 0.6)
-                ],
-                center: .init(x: 0.5, y: 0.4)
-            )
+                CameraStatusOverlay(cameraManager: appState.cameraManager)
 
-            // Camera permission / error states
-            CameraStatusOverlay(cameraManager: appState.cameraManager)
-
-            // Teleprompter overlay
-            if !appState.teleprompterState.text.isEmpty {
-                TeleprompterView(state: appState.teleprompterState)
-                    .mask(
-                        LinearGradient(
-                            stops: [
-                                .init(color: .clear, location: 0.0),
-                                .init(color: .white, location: 0.2),
-                                .init(color: .white, location: 0.65),
-                                .init(color: .clear, location: 0.85)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
+                if !appState.teleprompterState.text.isEmpty {
+                    TeleprompterView(state: appState.teleprompterState)
+                        .mask(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: .clear, location: 0.0),
+                                    .init(color: .white, location: 0.2),
+                                    .init(color: .white, location: 0.65),
+                                    .init(color: .clear, location: 0.85)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         )
-                    )
-            }
+                }
 
-            // Recording indicator
-            if appState.recordingManager.isRecording {
-                RecordingIndicator(recording: appState.recordingManager)
-            }
+                if appState.recordingManager.isRecording {
+                    RecordingIndicator(recording: appState.recordingManager)
+                }
 
-            // Reading line
-            if appState.teleprompterState.isScrolling {
-                readingLineIndicator
+                if appState.teleprompterState.isScrolling {
+                    readingLineIndicator
+                }
             }
+            .frame(width: viewWidth, height: cameraHeight)
+            .mask(
+                NotchFadeMask()
+                    .frame(width: viewWidth, height: cameraHeight)
+            )
 
-            // Hover controls
-            if isHovering {
-                ControlOverlay(appState: appState)
-                    .transition(.opacity)
-            }
+            // Pop-out controls — outside the mask, spring cascade on hover
+            PopOutControlBar(appState: appState, isHovering: isHovering)
+                .frame(width: viewWidth, height: controlsHeight)
         }
-        .frame(width: viewWidth, height: viewHeight)
-        // Notch mask: flat top + wide shallow semicircle + infinity fade
-        .mask(
-            NotchFadeMask()
-                .frame(width: viewWidth, height: viewHeight)
-        )
+        .frame(width: viewWidth, height: totalHeight)
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.25)) {
                 isHovering = hovering
@@ -112,8 +92,6 @@ struct FloatingCameraView: View {
         .scaleEffect(appeared ? 1.0 : 0.95)
         .opacity(appeared ? 1.0 : 0.0)
         .onAppear {
-            // Only auto-request permission if onboarding is complete
-            // (onboarding handles the permission flow itself)
             if appState.hasCompletedOnboarding {
                 Task { await appState.cameraManager.requestPermission() }
             }
@@ -123,7 +101,7 @@ struct FloatingCameraView: View {
 
     private var readingLineIndicator: some View {
         VStack {
-            Spacer().frame(height: viewHeight * 0.38)
+            Spacer().frame(height: cameraHeight * 0.38)
             HStack(spacing: 6) {
                 capsuleLine
                 Circle().fill(.white.opacity(0.3)).frame(width: 3, height: 3)
@@ -219,127 +197,179 @@ struct CameraStatusOverlay: View {
     }
 }
 
-// MARK: - Control Overlay
+// MARK: - Pop-Out Control Bar
 
-struct ControlOverlay: View {
+struct PopOutControlBar: View {
     @ObservedObject var teleprompterState: TeleprompterState
     @ObservedObject var recordingManager: RecordingManager
     let appState: AppState
+    let isHovering: Bool
 
-    init(appState: AppState) {
+    init(appState: AppState, isHovering: Bool) {
         self.appState = appState
         self.teleprompterState = appState.teleprompterState
         self.recordingManager = appState.recordingManager
+        self.isHovering = isHovering
     }
 
     var body: some View {
-        VStack {
-            Spacer()
-            HStack(spacing: 12) {
-                glassButton(
-                    icon: recordingManager.isRecording ? "stop.fill" : "record.circle",
-                    tint: .red,
-                    action: { appState.toggleRecording() }
+        ZStack {
+            // Frosted glass pill background
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                 )
-                glassButton(
-                    icon: teleprompterState.isScrolling ? "pause.fill" : "play.fill",
-                    tint: Color.brand,
-                    action: { teleprompterState.toggleScrolling() }
+                .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
+                .frame(width: 240, height: 44)
+                .opacity(isHovering ? 1 : 0)
+                .scaleEffect(isHovering ? 1.0 : 0.85)
+                .animation(
+                    .spring(response: 0.35, dampingFraction: 0.75),
+                    value: isHovering
                 )
-                glassButton(
-                    icon: "arrow.counterclockwise",
-                    tint: Color.brand,
-                    action: { teleprompterState.resetPosition() },
-                    size: 11
-                )
-                Spacer()
-                glassButton(
-                    icon: "xmark",
-                    tint: Color.brand,
-                    action: { appState.toggleWindow() },
-                    size: 11
-                )
+
+            // Buttons with staggered spring cascade
+            HStack(spacing: 18) {
+                cascadeButton(index: 0) {
+                    controlButton(
+                        icon: recordingManager.isRecording ? "stop.fill" : "record.circle",
+                        tint: .red,
+                        size: 34,
+                        iconSize: 14,
+                        action: { appState.toggleRecording() }
+                    )
+                }
+                cascadeButton(index: 1) {
+                    controlButton(
+                        icon: teleprompterState.isScrolling ? "pause.fill" : "play.fill",
+                        tint: Color.brand,
+                        size: 30,
+                        iconSize: 12,
+                        action: { teleprompterState.toggleScrolling() }
+                    )
+                }
+                cascadeButton(index: 2) {
+                    controlButton(
+                        icon: "arrow.counterclockwise",
+                        tint: Color.brand,
+                        size: 30,
+                        iconSize: 11,
+                        action: { teleprompterState.resetPosition() }
+                    )
+                }
+                cascadeButton(index: 3) {
+                    controlButton(
+                        icon: "xmark",
+                        tint: .white.opacity(0.6),
+                        size: 30,
+                        iconSize: 11,
+                        action: { appState.toggleWindow() }
+                    )
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-            .background(
-                // Glass-like control bar
-                Capsule()
-                    .fill(.ultraThinMaterial.opacity(0.6))
-                    .padding(.horizontal, 12)
-            )
-            .padding(.bottom, 8)
         }
+        .offset(y: isHovering ? -4 : -16)
+        .animation(
+            .spring(response: 0.4, dampingFraction: 0.75),
+            value: isHovering
+        )
     }
 
-    private func glassButton(icon: String, tint: Color = .white, action: @escaping () -> Void, size: CGFloat = 13) -> some View {
+    @ViewBuilder
+    private func cascadeButton<Content: View>(index: Int, @ViewBuilder content: () -> Content) -> some View {
+        content()
+            .opacity(isHovering ? 1 : 0)
+            .scaleEffect(isHovering ? 1.0 : 0.5)
+            .offset(y: isHovering ? 0 : 10)
+            .animation(
+                .spring(response: 0.35, dampingFraction: 0.65)
+                    .delay(Double(index) * 0.05),
+                value: isHovering
+            )
+    }
+
+    private func controlButton(icon: String, tint: Color, size: CGFloat, iconSize: CGFloat, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: size, weight: .semibold))
-                .foregroundColor(tint.opacity(0.9))
-                .frame(width: 28, height: 28)
-                .background(.ultraThinMaterial.opacity(0.4))
-                .clipShape(Circle())
+            ZStack {
+                Circle()
+                    .fill(tint.opacity(0.15))
+                    .frame(width: size + 8, height: size + 8)
+                    .blur(radius: 8)
+
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: size, height: size)
+                    .overlay(
+                        Circle()
+                            .stroke(tint.opacity(0.3), lineWidth: 0.5)
+                    )
+                    .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
+
+                Image(systemName: icon)
+                    .font(.system(size: iconSize, weight: .medium))
+                    .foregroundColor(tint)
+            }
         }
         .buttonStyle(.plain)
     }
 }
 
+// MARK: - Notch Shape
+
+/// The notch arch: flat top with rounded corners, wide shallow semicircle bottom.
+private struct NotchShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width
+        let h = rect.height
+        let archDepth = h * 0.72
+        let sideInset = w * 0.08
+        let cornerR = w * 0.05
+
+        var path = Path()
+        path.move(to: CGPoint(x: sideInset, y: cornerR))
+        path.addQuadCurve(
+            to: CGPoint(x: sideInset + cornerR, y: 0),
+            control: CGPoint(x: sideInset, y: 0)
+        )
+        path.addLine(to: CGPoint(x: w - sideInset - cornerR, y: 0))
+        path.addQuadCurve(
+            to: CGPoint(x: w - sideInset, y: cornerR),
+            control: CGPoint(x: w - sideInset, y: 0)
+        )
+        path.addCurve(
+            to: CGPoint(x: w * 0.5, y: archDepth),
+            control1: CGPoint(x: w - sideInset, y: archDepth * 0.5),
+            control2: CGPoint(x: w * 0.68, y: archDepth)
+        )
+        path.addCurve(
+            to: CGPoint(x: sideInset, y: cornerR),
+            control1: CGPoint(x: w * 0.32, y: archDepth),
+            control2: CGPoint(x: sideInset, y: archDepth * 0.5)
+        )
+        path.closeSubpath()
+        return path
+    }
+}
+
 // MARK: - Notch Fade Mask
 
-/// A mask that creates a flat-top wide semicircle with a silky smooth gaussian fade.
-/// Flat top hugs the menu bar, wide shallow arc curves down, edges dissolve smoothly.
-/// Uses 40 concentric layers with an easeOut opacity curve for buttery gradation.
+/// Uses real gaussian blur on a solid shape for perfectly smooth edge fade.
+/// Two layers: a tight inner blur (crisp core) + a wider outer blur (soft halo).
 private struct NotchFadeMask: View {
     var body: some View {
-        Canvas { context, size in
-            let w = size.width
-            let h = size.height
+        ZStack {
+            // Outer halo — wide soft fade
+            NotchShape()
+                .fill(.white)
+                .blur(radius: 20)
 
-            let archDepth = h * 0.6
-            let sideInset = w * 0.03
-
-            // Core arch path — flat top, wide shallow semicircle bottom
-            var archPath = Path()
-            archPath.move(to: CGPoint(x: sideInset, y: 0))
-            archPath.addLine(to: CGPoint(x: w - sideInset, y: 0))
-            // Smooth cubic curves for a more natural arc
-            archPath.addCurve(
-                to: CGPoint(x: w * 0.5, y: archDepth),
-                control1: CGPoint(x: w - sideInset, y: archDepth * 0.55),
-                control2: CGPoint(x: w * 0.72, y: archDepth)
-            )
-            archPath.addCurve(
-                to: CGPoint(x: sideInset, y: 0),
-                control1: CGPoint(x: w * 0.28, y: archDepth),
-                control2: CGPoint(x: sideInset, y: archDepth * 0.55)
-            )
-            archPath.closeSubpath()
-
-            // 40 layers from outermost (faintest) to innermost (solid)
-            // Gaussian-like falloff: opacity = e^(-3 * t^2)
-            let layerCount = 40
-            let maxExpand: CGFloat = 0.5 // how far the fade extends beyond the core
-
-            for i in (0..<layerCount).reversed() {
-                let t = CGFloat(i) / CGFloat(layerCount - 1) // 0 = core, 1 = outermost
-                let expand = t * maxExpand
-
-                // Gaussian curve for opacity
-                let gaussian = exp(-3.0 * Double(t * t))
-                let opacity = max(0.0, gaussian)
-
-                let scaleX = 1.0 + expand * 0.6
-                let scaleY = 1.0 + expand * 1.4 // fade more aggressively downward
-
-                var transform = CGAffineTransform.identity
-                    .translatedBy(x: w * 0.5, y: 0)
-                    .scaledBy(x: scaleX, y: scaleY)
-                    .translatedBy(x: -w * 0.5, y: 0)
-
-                let scaledPath = archPath.applying(transform)
-                context.fill(scaledPath, with: .color(.white.opacity(opacity)))
-            }
+            // Inner core — crisp with slight edge softening
+            NotchShape()
+                .fill(.white)
+                .blur(radius: 8)
         }
+        .compositingGroup()
     }
 }

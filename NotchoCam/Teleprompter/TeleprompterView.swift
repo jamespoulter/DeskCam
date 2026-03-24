@@ -17,8 +17,8 @@ struct TeleprompterView: View {
                     .multilineTextAlignment(.center)
                     .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)
-                    // Narrower text column for the wider window
-                    .frame(width: min(geometry.size.width - 120, 380), alignment: .center)
+                    // Narrow column to stay inside the visible notch arch
+                    .frame(width: min(geometry.size.width * 0.55, 260), alignment: .center)
                     .frame(maxWidth: .infinity)
 
                 Spacer()
